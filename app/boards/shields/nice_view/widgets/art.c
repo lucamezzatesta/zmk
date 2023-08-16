@@ -228,7 +228,6 @@ const lv_img_dsc_t mountain = {
     .data = mountain_map,
 };
 
-
 #ifndef LV_ATTRIBUTE_IMG_SYNTHESIA
 #define LV_ATTRIBUTE_IMG_SYNTHESIA
 #endif
@@ -337,7 +336,6 @@ const lv_img_dsc_t synthesia = {
     .data = synthesia_map,
 };
 
-
 #ifndef LV_ATTRIBUTE_IMG_MEZZAVERSE
 #define LV_ATTRIBUTE_IMG_MEZZAVERSE
 #endif
@@ -444,4 +442,3 @@ const lv_img_dsc_t mezzaverse = {
     .data_size = 1232,
     .data = mezzaverse_map,
 };
-
