@@ -37,7 +37,7 @@ values={[
 
 This example configures a tap-dance named `td0` that outputs the number of times its binding is pressed from 1-3.
 
-```title="Basic Tap-Dance Example: Counter"
+```dts title="Basic Tap-Dance Example: Counter"
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
 
@@ -45,7 +45,6 @@ This example configures a tap-dance named `td0` that outputs the number of times
     behaviors {
         td0: tap_dance_0 {
             compatible = "zmk,behavior-tap-dance";
-            label = "TAP_DANCE_0";
             #binding-cells = <0>;
             tapping-term-ms = <200>;
             bindings = <&kp N1>, <&kp N2>, <&kp N3>;
@@ -78,7 +77,7 @@ Alphanumeric [`key press`](key-press.md) bindings, like those used for `td0`, wi
 
 This example configures a mod-tap inside a tap-dance named `td_mt` that outputs `CAPSLOCK` on a single tap, `LSHIFT` on a single press and hold, and `LCTRL` when the tap-dance is pressed twice.
 
-```title="Advanced Tap-Dance Example: Nested Mod-Tap"
+```dts title="Advanced Tap-Dance Example: Nested Mod-Tap"
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
 
@@ -86,7 +85,6 @@ This example configures a mod-tap inside a tap-dance named `td_mt` that outputs 
     behaviors {
         td_mt: tap_dance_mod_tap {
             compatible = "zmk,behavior-tap-dance";
-            label = "TAP_DANCE_MOD_TAP";
             #binding-cells = <0>;
             tapping-term-ms = <200>;
             bindings = <&mt LSHIFT CAPSLOCK>, <&kp LCTRL>;

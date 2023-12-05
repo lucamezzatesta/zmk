@@ -20,17 +20,20 @@ It is recommended to only enable logging when needed, and not leaving it on by d
 
 ## Kconfig
 
-The `CONFIG_ZMK_USB_LOGGING` KConfig value needs to be set, either by copy and pasting into the `app/prj.conf` file, or by running
-`west build -t menuconfig` and manually enabling the setting in that UI at `ZMK -> Advanced -> USB Logging`.
+The `CONFIG_ZMK_USB_LOGGING` Kconfig enables USB logging. This can be set at the keyboard level, typically in the `config/<your_keyboard>.conf`
+file if you are using a [user config repository](user-setup.md). It can also be enabled at the ZMK level using the `app/prj.conf` file, or other
+search locations described in the [configuration overview](config/index.md#config-file-locations).
+
+Logging can be further configured using Kconfig described in [the Zephyr documentation](https://docs.zephyrproject.org/3.2.0/services/logging/index.html).
+For instance, setting `CONFIG_LOG_PROCESS_THREAD_STARTUP_DELAY_MS` to a large value such as `8000` might help catch issues that happen near keyboard
+boot, before you can connect to view the logs.
 
 :::note
-If you are debugging your own keyboard in your [user config repository](user-setup.md), use
-`config/boards/shields/<your_keyboard>/<your_keyboard>.conf` instead of `app/prj.conf`. In Github
-Actions, you can search the `Kconfig file` build log to verify the options above have been enabled
+In Github Actions, you can check the `<Keyboard> Kconfig file` step output to verify the options above have been enabled
 for you successfully.
 :::
 
-```
+```ini
 # Turn on logging, and set ZMK logging to debug output
 CONFIG_ZMK_USB_LOGGING=y
 ```
@@ -50,7 +53,7 @@ values={[
 
 On Linux, this should be a device like `/dev/ttyACM0` and you can connect with `minicom` or `tio` as usual, e.g.:
 
-```
+```sh
 sudo tio /dev/ttyACM0
 ```
 
@@ -71,7 +74,7 @@ If you already have the Ardunio IDE installed you can also use its built-in Seri
 On macOS, the device name is something like `/dev/tty.usbmodemXXXXX` where `XXXXX` is some numerical ID.
 You can connect to the device with [tio](https://tio.github.io/) (can be installed via [Homebrew](https://formulae.brew.sh/formula/tio)):
 
-```
+```sh
 sudo tio /dev/tty.usbmodem14401
 ```
 
@@ -80,3 +83,32 @@ You should see tio printing `Disconnected` or `Connected` when you disconnect or
 </Tabs>
 
 From there, you should see the various log messages from ZMK and Zephyr, depending on which systems you have set to what log levels.
+
+## Adding USB Logging to a Board
+
+Standard boards such as the nice!nano and Seeeduino XIAO family have the necessary configuration for logging already added, however if you are developing your own standalone board you may wish to add the ability to use USB logging in the future.
+
+To add USB logging to a board you need to define the USB CDC ACM device that the serial output gets piped to, as well as adding the console in the `chosen` node inside `<board>.dts`.
+
+Inside the USB device (`&usbd`), add the CDC ACM node:
+
+```dts
+&usbd {
+    status = "okay";
+    cdc_acm_uart: cdc_acm_uart {
+        compatible = "zephyr,cdc-acm-uart";
+    };
+};
+```
+
+Then you can add the `zephyr,console` binding in the `chosen` node:
+
+```dts
+/ {
+    chosen {
+        ...
+        zephyr,console = &cdc_acm_uart;
+    };
+    ...
+};
+```

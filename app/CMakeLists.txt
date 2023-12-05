@@ -8,13 +8,14 @@ list(APPEND DTS_ROOT ${CMAKE_SOURCE_DIR}/drivers/zephyr)
 set(ZephyrBuildConfiguration_ROOT ${CMAKE_SOURCE_DIR}/cmake)
 
 list(APPEND ZEPHYR_EXTRA_MODULES
-  ${CMAKE_CURRENT_SOURCE_DIR}/drivers
+  ${CMAKE_CURRENT_SOURCE_DIR}/module
 )
 
 # Find Zephyr. This also loads Zephyr's build system.
 find_package(Zephyr REQUIRED HINTS ../zephyr)
 project(zmk)
 
+zephyr_linker_sources(SECTIONS include/linker/zmk-behaviors.ld)
 zephyr_linker_sources(RODATA include/linker/zmk-events.ld)
 
 # Add your source file to the "app" target. This must come after
@@ -22,6 +23,7 @@ zephyr_linker_sources(RODATA include/linker/zmk-events.ld)
 target_include_directories(app PRIVATE include)
 target_sources(app PRIVATE src/stdlib.c)
 target_sources(app PRIVATE src/activity.c)
+target_sources(app PRIVATE src/behavior.c)
 target_sources(app PRIVATE src/kscan.c)
 target_sources(app PRIVATE src/matrix_transform.c)
 target_sources(app PRIVATE src/sensors.c)
@@ -31,12 +33,14 @@ target_sources_ifdef(CONFIG_ZMK_EXT_POWER app PRIVATE src/ext_power_generic.c)
 target_sources(app PRIVATE src/events/activity_state_changed.c)
 target_sources(app PRIVATE src/events/position_state_changed.c)
 target_sources(app PRIVATE src/events/sensor_event.c)
+target_sources(app PRIVATE src/events/mouse_button_state_changed.c)
 target_sources_ifdef(CONFIG_ZMK_WPM app PRIVATE src/events/wpm_state_changed.c)
 target_sources_ifdef(CONFIG_USB_DEVICE_STACK app PRIVATE src/events/usb_conn_state_changed.c)
 target_sources(app PRIVATE src/behaviors/behavior_reset.c)
 target_sources_ifdef(CONFIG_ZMK_EXT_POWER app PRIVATE src/behaviors/behavior_ext_power.c)
 if ((NOT CONFIG_ZMK_SPLIT) OR CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
   target_sources(app PRIVATE src/hid.c)
+  target_sources_ifdef(CONFIG_ZMK_MOUSE app PRIVATE src/mouse.c)
   target_sources(app PRIVATE src/behaviors/behavior_key_press.c)
   target_sources_ifdef(CONFIG_ZMK_BEHAVIOR_KEY_TOGGLE app PRIVATE src/behaviors/behavior_key_toggle.c)
   target_sources(app PRIVATE src/behaviors/behavior_hold_tap.c)
@@ -54,17 +58,19 @@ if ((NOT CONFIG_ZMK_SPLIT) OR CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
   target_sources_ifdef(CONFIG_ZMK_BEHAVIOR_SENSOR_ROTATE app PRIVATE src/behaviors/behavior_sensor_rotate.c)
   target_sources_ifdef(CONFIG_ZMK_BEHAVIOR_SENSOR_ROTATE_VAR app PRIVATE src/behaviors/behavior_sensor_rotate_var.c)
   target_sources_ifdef(CONFIG_ZMK_BEHAVIOR_SENSOR_ROTATE_COMMON app PRIVATE src/behaviors/behavior_sensor_rotate_common.c)
+  target_sources_ifdef(CONFIG_ZMK_BEHAVIOR_MOUSE_KEY_PRESS app PRIVATE src/behaviors/behavior_mouse_key_press.c)
   target_sources(app PRIVATE src/combo.c)
   target_sources(app PRIVATE src/behaviors/behavior_tap_dance.c)
   target_sources(app PRIVATE src/behavior_queue.c)
   target_sources(app PRIVATE src/conditional_layer.c)
   target_sources(app PRIVATE src/endpoints.c)
-  target_sources(app PRIVATE src/events/endpoint_selection_changed.c)
+  target_sources(app PRIVATE src/events/endpoint_changed.c)
   target_sources(app PRIVATE src/hid_listener.c)
   target_sources(app PRIVATE src/keymap.c)
   target_sources(app PRIVATE src/events/layer_state_changed.c)
   target_sources(app PRIVATE src/events/modifiers_state_changed.c)
   target_sources(app PRIVATE src/events/keycode_state_changed.c)
+  target_sources_ifdef(CONFIG_ZMK_HID_INDICATORS app PRIVATE src/hid_indicators.c)
 
   if (CONFIG_ZMK_BLE)
     target_sources(app PRIVATE src/events/ble_active_profile_changed.c)
@@ -79,6 +85,8 @@ target_sources_ifdef(CONFIG_ZMK_BACKLIGHT app PRIVATE src/behaviors/behavior_bac
 
 target_sources_ifdef(CONFIG_ZMK_BATTERY_REPORTING app PRIVATE src/events/battery_state_changed.c)
 target_sources_ifdef(CONFIG_ZMK_BATTERY_REPORTING app PRIVATE src/battery.c)
+
+target_sources_ifdef(CONFIG_ZMK_HID_INDICATORS app PRIVATE src/events/hid_indicators_changed.c)
 
 target_sources_ifdef(CONFIG_ZMK_SPLIT app PRIVATE src/events/split_peripheral_status_changed.c)
 add_subdirectory(src/split)

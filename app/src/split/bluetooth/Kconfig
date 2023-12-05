@@ -14,6 +14,7 @@ config ZMK_SPLIT_ROLE_CENTRAL
     select BT_CENTRAL
     select BT_GATT_CLIENT
     select BT_GATT_AUTO_DISCOVER_CCC
+    select BT_SCAN_WITH_IDENTITY
 
 if ZMK_SPLIT_ROLE_CENTRAL
 
@@ -60,9 +61,6 @@ config ZMK_SPLIT_BLE_PERIPHERAL_PRIORITY
 config ZMK_SPLIT_BLE_PERIPHERAL_POSITION_QUEUE_SIZE
     int "Max number of key position state events to queue to send to the central"
     default 10
-
-config ZMK_USB
-    default n
 
 config BT_MAX_PAIRED
     default 1
